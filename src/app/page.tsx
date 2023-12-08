@@ -1,11 +1,25 @@
 "use client"
 
 import { TaskProps } from "@/types/Task";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Page() {
   const [taskList, setTaskList] = useState<TaskProps[]>([]);
   const [taskName, setTaskName] = useState('');
+
+  useEffect(() => {
+    const storageList = localStorage.getItem('@task_list');
+  
+    if (storageList) {
+      setTaskList(JSON.parse(storageList));
+    } else {
+      setTaskList([]);
+    }
+  }, []);
+
+  function updateStorageList(list: TaskProps[]) {
+    localStorage.setItem('@task_list', JSON.stringify(list));
+  }
 
   function handleAddPress() {
     const taskListBody: TaskProps = {
@@ -13,9 +27,11 @@ function Page() {
       name: taskName,
       isChecked: false,
     };
+    const newList = [...taskList, taskListBody];
 
-    setTaskList([...taskList, taskListBody]);
+    setTaskList(newList);
     setTaskName('');
+    updateStorageList(newList);
   }
 
   function handleTogglePress(idList: number) {
@@ -30,11 +46,13 @@ function Page() {
     });
 
     setTaskList(newList);
+    updateStorageList(newList);
   }
 
   function handleDeletePress(idList: number) {
     const newList = taskList.filter((task) => task.id !== idList);
     setTaskList(newList);
+    updateStorageList(newList);
   }
 
   function renderList() {
@@ -58,9 +76,9 @@ function Page() {
   return (
     <main className="bg-gradient-to-r from-blue-500 to-blue-700 min-h-screen flex justify-center">
       <div className="mt-5 w-full px-3 mb-3 md:px-0 md:w-3/5">
-        <div className="bg-white w-full flex items-center bg-blue-400/50 p-3">
+        <div className="bg-white w-full flex items-center bg-blue-400/50">
           <input
-            placeholder="O que voce fará?"
+            placeholder="O que você fará?"
             className="w-full outline-none p-3"
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
