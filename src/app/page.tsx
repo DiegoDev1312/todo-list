@@ -1,58 +1,48 @@
 "use client"
 
+import { taskReducer } from "@/reducers/taskReducer";
 import { TaskProps } from "@/types/Task";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 function Page() {
-  const [taskList, setTaskList] = useState<TaskProps[]>([]);
+  const storageList = localStorage.getItem('@task_list');
   const [taskName, setTaskName] = useState('');
+  const [taskList, dispatch] = useReducer(taskReducer, storageList ? JSON.parse(storageList) : []);
 
   useEffect(() => {
-    const storageList = localStorage.getItem('@task_list');
-  
-    if (storageList) {
-      setTaskList(JSON.parse(storageList));
-    } else {
-      setTaskList([]);
-    }
-  }, []);
+    updateStorageList(taskList.length > 0 ? taskList : []);
+  }, [taskList]);
 
   function updateStorageList(list: TaskProps[]) {
     localStorage.setItem('@task_list', JSON.stringify(list));
   }
 
   function handleAddPress() {
-    const taskListBody: TaskProps = {
-      id: taskList.length + 1,
-      name: taskName,
-      isChecked: false,
-    };
-    const newList = [...taskList, taskListBody];
-
-    setTaskList(newList);
+    dispatch({
+      type: 'add',
+      payload: {
+        taskName,
+      },
+    });
     setTaskName('');
-    updateStorageList(newList);
   }
 
   function handleTogglePress(idList: number) {
-    const newList = taskList.map((list) => {
-      if (list.id === idList) {
-        return {
-          ...list,
-          isChecked: !list.isChecked,
-        }
-      }
-      return list;
+    dispatch({
+      type: 'toggleDone',
+      payload: {
+        id: idList,
+      },
     });
-
-    setTaskList(newList);
-    updateStorageList(newList);
   }
 
   function handleDeletePress(idList: number) {
-    const newList = taskList.filter((task) => task.id !== idList);
-    setTaskList(newList);
-    updateStorageList(newList);
+    dispatch({
+      type: 'remove',
+      payload: {
+        id: idList,
+      },
+    });
   }
 
   function renderList() {
@@ -62,7 +52,7 @@ function Page() {
       return (
         <label className="flex items-center justify-between p-2 gap-2 relative" key={task.id}>
           <div className="flex items-center gap-2 break-words break-all cursor-pointer w-11/12">
-            <input type='checkbox' checked={task.isChecked} className="h-4 w-4" onClick={() => handleTogglePress(task.id)} />
+            <input type='checkbox' checked={task.isChecked} className="h-4 w-4" onChange={() => handleTogglePress(task.id)} />
             <p className={`${coditionThrough} `}>{task.name}</p>
           </div>
           <button onClick={() => handleDeletePress(task.id)}  className="h-8 w-8">
