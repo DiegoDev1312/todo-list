@@ -6,7 +6,7 @@ import { TaskProps } from "@/types/Task";
 import { v4 as uuidv4 } from 'uuid';
 
 function Page() {
-  const storageList = typeof window !== "undefined" ? localStorage.getItem('@task_list') : null;
+  const storageList = localStorage.getItem('@task_list');
   const [taskName, setTaskName] = useState('');
   const [taskList, dispatch] = useReducer(taskReducer, storageList ? JSON.parse(storageList) : []);
   const [editId, setEditId] = useState<string>('');
@@ -17,9 +17,7 @@ function Page() {
   }, [taskList]);
 
   function updateStorageList(list: TaskProps[]) {
-    if (typeof window !== "undefined") {
-      localStorage.setItem('@task_list', JSON.stringify(list));
-    }
+    localStorage.setItem('@task_list', JSON.stringify(list));
   }
 
   function handleAddPress() {
@@ -83,8 +81,12 @@ function Page() {
           <label className="flex items-center p-2 gap-2" key={task.id}>
             <input value={editText} onChange={(event) => setEditText(event.target.value)} className="h-8 pl-2" />
             <div className="flex items-center gap-2">
-              <button className="hover:text-blue-400 text-gray-800" onClick={handleConfirmEditPress}>Confirmar</button>
-              <button className="hover:text-red-500 text-gray-800" onClick={closeEditArea}>Cancelar</button>
+              <button className="hover:text-blue-400 text-gray-800" onClick={handleConfirmEditPress}>
+                <img src="./confirmIcon.svg" className="h-5 w-5 object-cover" />
+              </button>
+              <button className="hover:text-red-500 text-gray-800" onClick={closeEditArea}>
+                <img src="./cancelIcon.svg" className="h-5 w-5 object-cover" />
+              </button>
             </div>
           </label>
         );
@@ -98,10 +100,10 @@ function Page() {
           </div>
           <div className="flex gap-1">
             <button onClick={() => handleDeletePress(task.id)}  className="h-8 w-8">
-              <img src="./bin-icon.svg"  className="h-5 w-5 object-cover" />
+              <img src="./bin-icon.svg" className="h-5 w-5 object-cover" />
             </button>
             <button onClick={() => handleEditPress(task.id, task.name)} className="h-8 w-8">
-              <img src="./edit-icon.svg"  className="h-5 w-5 object-cover" />
+              <img src="./edit-icon.svg" className="h-5 w-5 object-cover" />
             </button>
           </div>
         </label>
@@ -124,13 +126,13 @@ function Page() {
         <div className="p-3 bg-white/80 flex items-center justify-center my-3">
           <p>{taskList.length} item(s) na lista</p>
         </div>
-      {taskList.length > 0 && (
-        <div className="bg-white/80">
-          <ul>
-            {renderList()}
-          </ul>
-        </div>
-      )}
+        {taskList.length > 0 && (
+          <div className="bg-white/80">
+            <ul>
+              {renderList()}
+            </ul>
+          </div>
+        )}
       </div>
     </main>
   )
