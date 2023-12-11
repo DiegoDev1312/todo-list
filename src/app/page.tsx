@@ -6,7 +6,7 @@ import { TaskProps } from "@/types/Task";
 import { v4 as uuidv4 } from 'uuid';
 
 function Page() {
-  const storageList = localStorage.getItem('@task_list');
+  const storageList =  typeof window !== "undefined" ? localStorage.getItem('@task_list') : null;
   const [taskName, setTaskName] = useState('');
   const [taskList, dispatch] = useReducer(taskReducer, storageList ? JSON.parse(storageList) : []);
   const [editId, setEditId] = useState<string>('');
