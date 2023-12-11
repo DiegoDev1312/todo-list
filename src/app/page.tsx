@@ -6,7 +6,7 @@ import { TaskProps } from "@/types/Task";
 import { v4 as uuidv4 } from 'uuid';
 
 function Page() {
-  const storageList =  typeof window !== "undefined" ? localStorage.getItem('@task_list') : null;
+  const storageList = typeof window !== "undefined" ? localStorage.getItem('@task_list') : null;
   const [taskName, setTaskName] = useState('');
   const [taskList, dispatch] = useReducer(taskReducer, storageList ? JSON.parse(storageList) : []);
   const [editId, setEditId] = useState<string>('');
@@ -17,7 +17,9 @@ function Page() {
   }, [taskList]);
 
   function updateStorageList(list: TaskProps[]) {
-    localStorage.setItem('@task_list', JSON.stringify(list));
+    if (typeof window !== "undefined") {
+      localStorage.setItem('@task_list', JSON.stringify(list));
+    }
   }
 
   function handleAddPress() {
