@@ -4,29 +4,38 @@ type AddAction = {
     type: 'add';
     payload: {
         taskName: string;
+        id: string;
     };
 };
 
 type ToggleDoneAction = {
     type: 'toggleDone';
     payload: {
-        id: number;
+        id: string;
     };
 };
 
 type DeleteAction = {
     type: 'remove';
     payload: {
-        id: number;
+        id: string;
     };
 };
 
-type TypeProps = AddAction | ToggleDoneAction | DeleteAction;
+type EditTextAction = {
+    type: 'editText';
+    payload: {
+        id: string;
+        text: string;
+    };
+};
+
+type TypeProps = AddAction | ToggleDoneAction | DeleteAction | EditTextAction;
 
 export function taskReducer(list: TaskProps[], type: TypeProps) {
     switch (type.type) {
         case 'add':
-            return [...list, { id: list.length + 1, name: type.payload.taskName,  isChecked: false }];
+            return [...list, { id: type.payload.id, name: type.payload.taskName,  isChecked: false }];
         case 'remove':
             return list.filter((item) => item.id !== type.payload.id);
         case 'toggleDone':
@@ -38,6 +47,16 @@ export function taskReducer(list: TaskProps[], type: TypeProps) {
                     };
                 }
 
+                return item;
+            });
+        case 'editText': 
+            return list.map((item) => {
+                if (item.id === type.payload.id) {
+                    return {
+                        ...item,
+                        name: type.payload.text,
+                    };
+                }
                 return item;
             });
         default: return list;
